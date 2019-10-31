@@ -1,12 +1,12 @@
 #include <elapsedMillis.h>
 #include <Bounce2.h>
 
-const uint8_t buttonPins[] = {10, 11, 12, 13}; //Pinovi za tastere
-const uint8_t pressedLED[] = {2, 3, 4, 5}; //Pinovi dioda
-const uint8_t movingLED[] = {6, 7, 8, 9}; //Pinovi za dekoder
-int binaryNum[] = {1, 0, 0, 0}; //Binarna vrednost pozicije lifta
+const uint8_t buttonPins[] = {10, 11, 12, 13};
+const uint8_t pressedLED[] = {2, 3, 4, 5};
+const uint8_t movingLED[] = {6, 7, 8, 9};
+int binaryNum[] = {1, 0, 0, 0};
 int startPos = 0;
-Bounce * buttons = new Bounce[4]; //Inicijalizacija Bounce objekta za sve tastere
+Bounce * buttons = new Bounce[4];
 
 void setup() {
   for(int i = 0; i < 4; i++) {
@@ -19,7 +19,6 @@ void setup() {
   }
 }
 
-//Funkcija za pretvaranje decimalnog u binarni broj
 void binary(int n) {
   for(int i = 0; i < 4; i++) {
     binaryNum[i] = n % 2;
@@ -27,16 +26,14 @@ void binary(int n) {
   }
 }
 
-//Funkcija za kretanje lifta od date početne do krajnje pozicije
 void moving(int endPos) {
-  if(endPos > startPos) //Ako lift treba da ide gore
+  if(endPos > startPos)
     for(int i = startPos + 1; i < endPos + 1; i++) {
       binary(i + 1);
-      for(int i = 0; i < 4; i++) //Postavlja ulazne pinove dekodera na dobijenu binarnu vrednost
+      for(int i = 0; i < 4; i++)
         digitalWrite(movingLED[i], binaryNum[i]);
-      for(int j = 0; j < 2; j++) //Poziva funkciju više puta i koristi njeno trajanje kao Delay
+      for(int j = 0; j < 2; j++)
         pressedButton();
-      //Ako je u toku kretanja lift naišao na sprat gde neko čeka, malo veći delay
       if(digitalRead(pressedLED[i]) == HIGH) {
         for(int j = 0; j < 10; j++)
           pressedButton();
@@ -45,7 +42,7 @@ void moving(int endPos) {
         for(int j = 0; j < 5; j++)
           pressedButton();
     }
-  else if(startPos > endPos) //Ako lift treba da ide dole
+  else if(startPos > endPos)
     for(int i = startPos + 1; i > endPos + 1; i--) {
       binary(i - 1);
       for(int i = 0; i < 4; i++)
@@ -60,14 +57,13 @@ void moving(int endPos) {
         for(int j = 0; j < 5; j++)
           pressedButton();
     }
-  digitalWrite(pressedLED[endPos], LOW); //Gasi krajnju diodu
-  startPos = endPos; //Stavlja novu početnu poziciju
+  digitalWrite(pressedLED[endPos], LOW);
+  startPos = endPos;
 }
 
-//Funkcija za proveravanje stanja tastera
 int pressedButton() {
   elapsedMillis counter;
-  while(counter < 100) //Traje 100 mili sekundi
+  while(counter < 100)
     for(int i = 0; i < 4; i++) {
       buttons[i].update();
       if(buttons[i].rose())
